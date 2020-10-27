@@ -27,8 +27,8 @@ def draw_bond(v, label, p1, d, radius):
     R = np.linalg.norm(d[:2])
     e = d/H
     x = np.array([0,1,0])
-    axis = np.cross(e,x)
     rot  = -acos(e@x)
+    axis = np.cross(e,x)
     v[label].set_object(g.Mesh(g.Cylinder(H, radius)))
     v[label].set_transform(tf.translation_matrix(p1).dot(tf.rotation_matrix(rot, axis).dot(tf.translation_matrix([0, H/2, 0]))))
 
@@ -74,6 +74,7 @@ Options:
         for p,q,r in ((x,y,z),(y,z,x),(z,x,y)):
             for a in (np.zeros(3), p, q, p+q):
                 draw_bond(v, f"cell{count}", a, r, 0.01)
+                count += 1
 
 
     @timeit
