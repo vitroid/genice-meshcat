@@ -40,11 +40,11 @@ Output the atomic positions on Colab using Meshcat.
 Options:
     H=x   Set the radius of H to be x
     """
-    size_H = 0.015
 
 
     def __init__(self, **kwargs):
         unknown = dict()
+        self.size_H = 0.015
         for k, v in kwargs.items():
             if k == "H":
                 self.size_H = float(v)
@@ -116,8 +116,8 @@ Options:
             H0 = water["H0"]
             H1 = water["H1"]
             draw_atom(v, f"O{i}", O, 0.03)
-            draw_atom(v, f"HA{i}", H0, size_H)
-            draw_atom(v, f"HB{i}", H1, size_H)
+            draw_atom(v, f"HA{i}", H0, self.size_H)
+            draw_atom(v, f"HB{i}", H1, self.size_H)
             draw_bond(v, f"OHA{i}", O, H0-O, 0.01)
             draw_bond(v, f"OHB{i}", O, H1-O, 0.01)
         v = self.vis["HB"]
