@@ -118,8 +118,8 @@ Options:
             draw_atom(v, f"O{i}", O, 0.03)
             draw_atom(v, f"HA{i}", H0, size_H)
             draw_atom(v, f"HB{i}", H1, size_H)
-            draw_bond(v, f"OHA{i}", O, H0-O, 0.01")
-            draw_bond(v, f"OHB{i}", O, H1-O, 0.01")
+            draw_bond(v, f"OHA{i}", O, H0-O, 0.01)
+            draw_bond(v, f"OHB{i}", O, H1-O, 0.01)
         v = self.vis["HB"]
         for i,j in ice.spacegraph.edges(data=False):
             if i in waters and j in waters:  # edge may connect to the dopant
