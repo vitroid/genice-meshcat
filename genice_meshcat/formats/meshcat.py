@@ -111,7 +111,7 @@ Options:
                 else:
                     waters[order]["H1"] = position
         v = self.vis["water"]
-        for order, water in waters.items():
+        for i, water in waters.items():
             O = water["O"]
             H0 = water["H0"]
             H1 = water["H1"]
