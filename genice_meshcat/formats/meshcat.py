@@ -10,12 +10,15 @@ from logging import getLogger
 import numpy as np
 from genice2.decorators import timeit, banner
 import genice2.formats
+import meshcat
 from meshcat.jupyter import JupyterVisualizer
 import meshcat.geometry as g
 import meshcat.transformations as tf
 import numpy as np
 from math import acos, pi
 import yaplotlib as yp # transient
+from time import sleep
+
 
 def draw_atom(v, label, atom, radius, color=0xffffff):
     v[label].set_object(g.Mesh(g.Sphere(radius), g.MeshLambertMaterial(color=color)))
@@ -28,7 +31,7 @@ def draw_bond(v, label, p1, d, radius, color=0xffffff):
     e = d/H
     x = np.array([0,1,0])
     rot  = -acos(e@x)
-    if rot < 1:
+    if -1 < e@x < 1:
         axis = np.cross(e,x)
         v[label].set_object(g.Mesh(g.Cylinder(H, radius), g.MeshLambertMaterial(color=color)))
         v[label].set_transform(tf.translation_matrix(p1).dot(tf.rotation_matrix(rot, axis).dot(tf.translation_matrix([0, H/2, 0]))))
@@ -57,7 +60,8 @@ Options:
                 unknown[k] = v
         super().__init__(**unknown)
         self.output = None
-        self.vis = JupyterVisualizer()
+        self.vis = meshcat.Visualizer().open()
+        #self.vis = JupyterVisualizer()
         self.vis.delete()
 
 
@@ -67,6 +71,9 @@ Options:
                 6:self.Hook6,
                 7:self.Hook7}
 
+    def dump(self):
+        sleep(100)
+        # wait forever
 
     @timeit
     @banner
@@ -106,25 +113,29 @@ Options:
         logger.info("  Total number of atoms: {0}".format(len(ice.atoms)))
         # prepare the reverse dict
         waters = defaultdict(dict)
+        molorder = -1
         for atom in ice.atoms:
             resno, resname, atomname, position, order = atom
+            if resno == 0:
+                molorder += 1
             if "O" in atomname:
-                waters[order]["O"] = position
+                waters[molorder]["O"] = position
             elif "H" in atomname:
-                if "H0" not in waters[order]:
-                    waters[order]["H0"] = position
+                if "H0" not in waters[molorder]:
+                    waters[molorder]["H0"] = position
                 else:
-                    waters[order]["H1"] = position
+                    waters[molorder]["H1"] = position
         v = self.vis["water"]
         for i, water in waters.items():
+            vv = v[f"water{i}"]
             O = water["O"]
             H0 = water["H0"]
             H1 = water["H1"]
-            draw_atom(v, f"O{i}", O, 0.03, color=0xff0000)
-            draw_atom(v, f"HA{i}", H0, self.size_H, color=0x00ffff)
-            draw_atom(v, f"HB{i}", H1, self.size_H, color=0x00ffff)
-            draw_bond(v, f"OHA{i}", O, H0-O, 0.01)
-            draw_bond(v, f"OHB{i}", O, H1-O, 0.01)
+            draw_atom(vv, f"O{i}", O, 0.03, color=0xff0000)
+            draw_atom(vv, f"HA{i}", H0, self.size_H, color=0x00ffff)
+            draw_atom(vv, f"HB{i}", H1, self.size_H, color=0x00ffff)
+            draw_bond(vv, f"OHA{i}", O, H0-O, 0.01)
+            draw_bond(vv, f"OHB{i}", O, H1-O, 0.01)
         v = self.vis["HB"]
         for i,j in ice.spacegraph.edges(data=False):
             if i in waters and j in waters:  # edge may connect to the dopant
@@ -159,9 +170,25 @@ Options:
         gatoms = ice.atoms[self.nwateratoms:]
         palettes = dict()
         v = self.vis["guest"]
+        # 原子列を、再度residueごとにグループ化する。無駄なように見えるが、
+        # Stage7の内部処理がかなり複雑なので、Stage7結果をそのまま使うのが合理的。
+        res_bucket = dict()
+        molorder = -1
         for atom in gatoms:
             resno, resname, atomname, position, order = atom
-            if atomname not in palettes:
-                palettes[atomname] = choose_palette(len(palettes)+1)
-            color = palettes[atomname]
-            draw_atom(v, f"{atomname}_{resno}{resname}", position, 0.04, color=color)
+            if resno == 0:
+                molorder += 1
+            reslabel = f"{resname}_{molorder}"
+            if reslabel not in res_bucket:
+                res_bucket[reslabel] = dict() # 原子名ごとの分類
+            if atomname not in res_bucket[reslabel]:
+                res_bucket[reslabel][atomname] = []
+            res_bucket[reslabel][atomname].append(position)
+        for reslabel in res_bucket:
+            vv = v[reslabel]
+            for atomname in res_bucket[reslabel]:
+                if atomname not in palettes:
+                    palettes[atomname] = choose_palette(len(palettes)+1)
+                color = palettes[atomname]
+                for i, position in enumerate(res_bucket[reslabel][atomname]):
+                    draw_atom(vv, f"{atomname}_{i}", position, 0.04, color=color)
