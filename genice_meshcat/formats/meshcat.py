@@ -66,7 +66,7 @@ Options:
                 unknown[k] = v
         super().__init__(**unknown)
         self.output = None
-        if Jupyter:
+        if jupyter:
             # Jupyter and colab inline
             self.vis = JupyterVisualizer()
         else:
