@@ -17,7 +17,7 @@ import numpy as np
 from math import acos, pi
 import yaplotlib as yp # transient
 
-def draw_atoms(v, label, atom, radius):
+def draw_atom(v, label, atom, radius):
     v[label].set_object(g.Mesh(g.Sphere(radius), g.MeshLambertMaterial(color=0xff11dd)))
     v[label].set_transform(tf.translation_matrix(atom))
 
