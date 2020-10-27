@@ -53,15 +53,25 @@ Options:
     def __init__(self, **kwargs):
         unknown = dict()
         self.size_H = 0.015
+        jupyter = False
         for k, v in kwargs.items():
             if k == "H":
                 self.size_H = float(v)
+            elif k == "Jupyter":
+                if v is None:
+                    jupyter = True
+                elif v is True:
+                    jupyter = True
             else:
                 unknown[k] = v
         super().__init__(**unknown)
         self.output = None
-        self.vis = meshcat.Visualizer().open()
-        #self.vis = JupyterVisualizer()
+        if Jupyter:
+            # Jupyter and colab inline
+            self.vis = JupyterVisualizer()
+        else:
+            # On a Browser window
+            self.vis = meshcat.Visualizer().open()
         self.vis.delete()
 
 
