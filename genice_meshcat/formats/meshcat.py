@@ -40,7 +40,7 @@ Output the atomic positions on Colab using Meshcat.
 Options:
     H=x   Set the radius of H to be x
     """
-    size_H = 0.01
+    size_H = 0.015
 
 
     def __init__(self, **kwargs):
@@ -58,15 +58,15 @@ Options:
 
     def hooks(self):
         return {1:self.Hook1,
-                2:self.Hook2,}
-                #6:self.Hook6,
+                2:self.Hook2,
+                6:self.Hook6,}
                 #7:self.Hook7}
 
 
     @timeit
     @banner
     def Hook1(self, ice):
-        "Draw the cell in Yaplot format."
+        "Draw the cell."
         logger = getLogger()
         v = self.vis["cell"]
         x,y,z = ice.repcell.mat
@@ -96,7 +96,7 @@ Options:
     @timeit
     @banner
     def Hook6(self, ice):
-        "Output water molecules in Yaplot format."
+        "Output water molecules."
         logger = getLogger()
         logger.info("  Total number of atoms: {0}".format(len(ice.atoms)))
         # prepare the reverse dict
@@ -110,28 +110,17 @@ Options:
                     waters[order]["H0"] = position
                 else:
                     waters[order]["H1"] = position
-        s = ""
-        s += yp.Color(3)
+        v = self.vis["water"]
         for order, water in waters.items():
             O = water["O"]
             H0 = water["H0"]
             H1 = water["H1"]
-            s += yp.Layer(4)
-            s += yp.Color(3)
-            s += yp.Size(0.03)
-            s += yp.Circle(O)
-            s += yp.Line(O,H0)
-            s += yp.Line(O,H1)
-            s += yp.Size(self.size_H)
-            s += yp.Circle(H0)
-            s += yp.Circle(H1)
-            s += yp.Color(2)
-            s += yp.Layer(1)
-            s += yp.Text(O, "{0}".format(order))
-        s += yp.Layer(3)
-        s += yp.Color(4)
-        s += yp.ArrowType(1)
-        s += yp.Size(0.03)
+            draw_atom(v, f"O{i}", O, 0.03)
+            draw_atom(v, f"HA{i}", H0, size_H)
+            draw_atom(v, f"HB{i}", H1, size_H)
+            draw_bond(v, f"OHA{i}", O, H0-O, 0.01")
+            draw_bond(v, f"OHB{i}", O, H1-O, 0.01")
+        v = self.vis["HB"]
         for i,j in ice.spacegraph.edges(data=False):
             if i in waters and j in waters:  # edge may connect to the dopant
                 O = waters[j]["O"]
@@ -142,10 +131,9 @@ Options:
                 rr0 = np.dot(d0,d0)
                 rr1 = np.dot(d1,d1)
                 if rr0 < rr1 and rr0 < 0.245**2:
-                    s += yp.Arrow(H0,O)
+                    draw_bond(v, f"HB{i}_{j}", O, d0, 0.005)
                 if rr1 < rr0 and rr1 < 0.245**2:
-                    s += yp.Arrow(H1,O)
-        self.output += s
+                    draw_bond(v, f"HB{i}_{j}", O, d1, 0.005)
         self.nwateratoms = len(ice.atoms)
 
 
