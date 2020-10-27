@@ -57,8 +57,8 @@ Options:
 
 
     def hooks(self):
-        return {1:self.Hook1,}
-                #2:self.Hook2,
+        return {1:self.Hook1,
+                2:self.Hook2,}
                 #6:self.Hook6,
                 #7:self.Hook7}
 
@@ -87,13 +87,9 @@ Options:
         # prepare the reverse dict
         waters = defaultdict(dict)
         pos = ice.reppositions @ ice.repcell.mat
-        s = ""
-        for p in pos:
-            s += yp.Layer(4)
-            s += yp.Color(3)
-            s += yp.Size(0.03)
-            s += yp.Circle(p)
-        self.output += s + yp.NewPage()
+        v = self.vis["com"]
+        for i, p in enumerate(pos):
+            draw_atom(v, f"com{i}", p, 0.03)
         return True
 
 
