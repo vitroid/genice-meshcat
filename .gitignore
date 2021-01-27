@@ -4,3 +4,5 @@ build/
 genice_meshcat.egg-info/
 
 meshcat-python
+
+*.pyc

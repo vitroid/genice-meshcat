@@ -1,5 +1,8 @@
 # coding: utf-8
+"""
+Visualize three-dimensionally in Jupyter / Google Colab.
 
+"""
 desc={"ref": {"Meshcat": "https://github.com/rdeits/meshcat-python"},
       "brief": "Meshcat + Google Colab.",
       "usage": ""}
