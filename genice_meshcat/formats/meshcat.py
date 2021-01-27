@@ -82,7 +82,7 @@ Options:
                 7:self.Hook7}
 
     def dump(self):
-        sleep(100)
+        sleep(5)
         # wait forever
 
     @timeit

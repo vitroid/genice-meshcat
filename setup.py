@@ -16,7 +16,7 @@ with codecs.open(os.path.join(os.path.dirname(__file__), 'genice_meshcat', '__in
 long_desc = "".join(open("README.md").readlines())
 
 setup(
-    name='genice-meshcat', # the package name
+    name='genice2-meshcat', # the package name
     version=metadata['version'],
     description='Meshcat format plugin for GenIce+Colab.',
     long_description=long_desc,
@@ -25,7 +25,7 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
     ],
     author='Masakazu Matsumoto',
     author_email='vitroid@gmail.com',
@@ -35,12 +35,11 @@ setup(
     packages=find_packages(),
 
     entry_points = {
-        'genice_format': [
-            'meshcat = genice_meshcat.formats.meshcat',
+        'genice2_format': [
+            'meshcat = genice2_meshcat.formats.meshcat',
         ],
     },
-    install_requires=['genice2', 'u-msgpack-python',
-                      'countrings>=0.1.7', 'jinja2'],
+    install_requires=['genice2', 'u-msgpack-python',],
 
     license='MIT',
 )
