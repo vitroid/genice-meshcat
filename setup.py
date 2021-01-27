@@ -9,7 +9,7 @@ import re
 #Copied from wheel package
 here = os.path.abspath(os.path.dirname(__file__))
 
-with codecs.open(os.path.join(os.path.dirname(__file__), 'genice_meshcat', '__init__.py'),
+with codecs.open(os.path.join(os.path.dirname(__file__), 'genice2_meshcat', '__init__.py'),
                  encoding='utf8') as version_file:
     metadata = dict(re.findall(r"""__([a-z]+)__ = "([^"]+)""", version_file.read()))
 
@@ -18,7 +18,7 @@ long_desc = "".join(open("README.md").readlines())
 setup(
     name='genice2-meshcat', # the package name
     version=metadata['version'],
-    description='Meshcat format plugin for GenIce+Colab.',
+    description='Meshcat format plugin for GenIce2+Colab.',
     long_description=long_desc,
     long_description_content_type="text/markdown",
     classifiers=[
