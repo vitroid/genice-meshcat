@@ -21,6 +21,7 @@ import numpy as np
 from math import acos, pi
 import yaplotlib as yp # transient
 from time import sleep
+from genice2.molecules  import serialize
 
 
 def draw_atom(v, label, atom, radius, color=0xffffff):
@@ -123,11 +124,13 @@ Options:
     def Hook6(self, ice):
         "Output water molecules."
         logger = getLogger()
-        logger.info("  Total number of atoms: {0}".format(len(ice.atoms)))
+        atoms = []
+        for mols in ice.universe:
+            atoms += serialize(mols)
         # prepare the reverse dict
         waters = defaultdict(dict)
         molorder = -1
-        for atom in ice.atoms:
+        for atom in atoms:
             resno, resname, atomname, position, order = atom
             if resno == 0:
                 molorder += 1
@@ -163,7 +166,6 @@ Options:
                     draw_bond(v, f"HB{i}_{j}", O, d0, 0.005, color=0xffff00)
                 if rr1 < rr0 and rr1 < 0.245**2:
                     draw_bond(v, f"HB{i}_{j}", O, d1, 0.005, color=0xffff00)
-        self.nwateratoms = len(ice.atoms)
 
 
     @timeit
@@ -179,8 +181,9 @@ Options:
             return int(r*255)*65536+int(g*255)*255+int(b*255)
 
         logger = getLogger()
-        logger.info("  Total number of atoms: {0}".format(len(ice.atoms)))
-        gatoms = ice.atoms[self.nwateratoms:]
+        gatoms = []
+        for mols in ice.universe[1:]:
+            gatoms += serialize(mols)
         palettes = dict()
         v = self.vis["guest"]
         # 原子列を、再度residueごとにグループ化する。無駄なように見えるが、
