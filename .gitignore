@@ -1,8 +1,8 @@
 
 dist/
 build/
-genice_meshcat.egg-info/
-
+*.egg-info/
+.ipynb_checkpoints/
 meshcat-python
 
 *.pyc
