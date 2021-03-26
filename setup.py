@@ -39,7 +39,7 @@ setup(
             'meshcat = genice2_meshcat.formats.meshcat',
         ],
     },
-    install_requires=['genice2', 'u-msgpack-python',],
+    install_requires=['genice2>=2.1b0', 'u-msgpack-python',],
 
     license='MIT',
 )
